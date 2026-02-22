@@ -6,6 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
     "asyncssh>=2.22.0",
     "mcp>=1.26.0",
+    "mcp-network-common",
     "python-dotenv>=1.2.1",
     "scrapli>=2025.1.30",
 ]
@@ -21,3 +22,6 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+
+[tool.uv.sources]
+mcp-network-common = { git = "https://github.com/rhuanssauro/mcp-network-common.git" }

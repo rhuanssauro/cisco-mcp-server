@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
+from mcp_network_common import CommandValidator
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# Use the same default CommandValidator as server.py
+validator = CommandValidator()
 
-from server import _config_guardrails, _validate_show
+_validate_show = validator.validate_readonly
+_config_guardrails = validator.validate_config
 
 
 class TestValidateShow:
@@ -23,12 +24,12 @@ class TestValidateShow:
     def test_rejects_non_show_command(self):
         err = _validate_show("configure terminal")
         assert err is not None
-        assert "Only 'show' commands" in err
+        assert "read-only" in err.lower()
 
     def test_rejects_ping_command(self):
         err = _validate_show("ping 8.8.8.8")
         assert err is not None
-        assert "Only 'show' commands" in err
+        assert "read-only" in err.lower()
 
     def test_blocks_copy(self):
         err = _validate_show("show copy running-config")
@@ -63,12 +64,12 @@ class TestValidateShow:
     def test_blocks_pipe(self):
         err = _validate_show("show version | include IOS")
         assert err is not None
-        assert "Pipe" in err
+        assert "pipe" in err.lower() or "redirect" in err.lower()
 
     def test_blocks_redirect(self):
         err = _validate_show("show version > /tmp/out")
         assert err is not None
-        assert "Pipe" in err
+        assert "pipe" in err.lower() or "redirect" in err.lower()
 
     def test_case_insensitive(self):
         assert _validate_show("SHOW VERSION") is None

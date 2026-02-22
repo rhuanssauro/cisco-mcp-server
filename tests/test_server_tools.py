@@ -62,7 +62,7 @@ class TestCiscoShow:
     async def test_show_rejects_non_show(self, mock_devices):
         result = json.loads(await cisco_show("router1", "configure terminal"))
         assert result["status"] == "error"
-        assert "Only 'show' commands" in result["error"]
+        assert "read-only" in result["error"].lower()
 
     async def test_show_rejects_pipe(self, mock_devices):
         result = json.loads(await cisco_show("router1", "show version | include IOS"))
