@@ -18,6 +18,11 @@ from typing import Any
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 from scrapli import AsyncScrapli
+from scrapli.exceptions import (
+    ScrapliAuthenticationFailed,
+    ScrapliConnectionError,
+    ScrapliTimeout,
+)
 
 load_dotenv()
 
@@ -153,14 +158,23 @@ async def cisco_show(device_name: str, command: str) -> str:
         conn = await _get_conn(device_name)
         try:
             response = await conn.send_command(command)
-            return json.dumps({
-                "status": "ok",
-                "device": device_name,
-                "command": command,
-                "output": response.result,
-            }, indent=2)
+            return json.dumps(
+                {
+                    "status": "ok",
+                    "device": device_name,
+                    "command": command,
+                    "output": response.result,
+                },
+                indent=2,
+            )
         finally:
             conn.close()
+    except ScrapliAuthenticationFailed as e:
+        logger.error(f"Auth failed on {device_name}: {e}")
+        return json.dumps({"status": "error", "error": f"Authentication failed: {e}"})
+    except (ScrapliConnectionError, ScrapliTimeout) as e:
+        logger.error(f"Connection error on {device_name}: {e}")
+        return json.dumps({"status": "error", "error": f"Connection error: {e}"})
     except Exception as e:
         logger.error(f"Error on {device_name}: {e}", exc_info=True)
         return json.dumps({"status": "error", "error": str(e)})
@@ -193,14 +207,23 @@ async def cisco_configure(device_name: str, config_commands: str) -> str:
         conn = await _get_conn(device_name)
         try:
             response = await conn.send_configs(lines)
-            return json.dumps({
-                "status": "ok",
-                "device": device_name,
-                "commands_applied": lines,
-                "output": response.result,
-            }, indent=2)
+            return json.dumps(
+                {
+                    "status": "ok",
+                    "device": device_name,
+                    "commands_applied": lines,
+                    "output": response.result,
+                },
+                indent=2,
+            )
         finally:
             conn.close()
+    except ScrapliAuthenticationFailed as e:
+        logger.error(f"Auth failed on {device_name}: {e}")
+        return json.dumps({"status": "error", "error": f"Authentication failed: {e}"})
+    except (ScrapliConnectionError, ScrapliTimeout) as e:
+        logger.error(f"Connection error on {device_name}: {e}")
+        return json.dumps({"status": "error", "error": f"Connection error: {e}"})
     except Exception as e:
         logger.error(f"Config error on {device_name}: {e}", exc_info=True)
         return json.dumps({"status": "error", "error": str(e)})
@@ -220,14 +243,23 @@ async def cisco_ping(device_name: str, target: str, count: int = 5) -> str:
         conn = await _get_conn(device_name)
         try:
             response = await conn.send_command(command, timeout_ops=120)
-            return json.dumps({
-                "status": "ok",
-                "device": device_name,
-                "target": target,
-                "output": response.result,
-            }, indent=2)
+            return json.dumps(
+                {
+                    "status": "ok",
+                    "device": device_name,
+                    "target": target,
+                    "output": response.result,
+                },
+                indent=2,
+            )
         finally:
             conn.close()
+    except ScrapliAuthenticationFailed as e:
+        logger.error(f"Auth failed on {device_name}: {e}")
+        return json.dumps({"status": "error", "error": f"Authentication failed: {e}"})
+    except (ScrapliConnectionError, ScrapliTimeout) as e:
+        logger.error(f"Connection error on {device_name}: {e}")
+        return json.dumps({"status": "error", "error": f"Connection error: {e}"})
     except Exception as e:
         logger.error(f"Ping error on {device_name}: {e}", exc_info=True)
         return json.dumps({"status": "error", "error": str(e)})
@@ -249,14 +281,23 @@ async def cisco_get_running_config(device_name: str, section: str = "") -> str:
         conn = await _get_conn(device_name)
         try:
             response = await conn.send_command(command)
-            return json.dumps({
-                "status": "ok",
-                "device": device_name,
-                "command": command,
-                "output": response.result,
-            }, indent=2)
+            return json.dumps(
+                {
+                    "status": "ok",
+                    "device": device_name,
+                    "command": command,
+                    "output": response.result,
+                },
+                indent=2,
+            )
         finally:
             conn.close()
+    except ScrapliAuthenticationFailed as e:
+        logger.error(f"Auth failed on {device_name}: {e}")
+        return json.dumps({"status": "error", "error": f"Authentication failed: {e}"})
+    except (ScrapliConnectionError, ScrapliTimeout) as e:
+        logger.error(f"Connection error on {device_name}: {e}")
+        return json.dumps({"status": "error", "error": f"Connection error: {e}"})
     except Exception as e:
         logger.error(f"Config fetch error on {device_name}: {e}", exc_info=True)
         return json.dumps({"status": "error", "error": str(e)})
