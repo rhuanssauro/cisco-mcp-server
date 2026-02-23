@@ -101,9 +101,7 @@ class TestCiscoShow:
 @pytest.mark.asyncio
 class TestCiscoConfigure:
     @patch("server._get_conn")
-    async def test_configure_success(
-        self, mock_get_conn, mock_devices, mock_scrapli_conn
-    ):
+    async def test_configure_success(self, mock_get_conn, mock_devices, mock_scrapli_conn):
         mock_get_conn.return_value = mock_scrapli_conn
         result = json.loads(
             await cisco_configure(
@@ -157,18 +155,14 @@ class TestCiscoPing:
     @patch("server._get_conn")
     async def test_ping_success(self, mock_get_conn, mock_devices, mock_scrapli_conn):
         mock_get_conn.return_value = mock_scrapli_conn
-        mock_scrapli_conn.send_command.return_value.result = (
-            "Success rate is 100 percent (5/5)"
-        )
+        mock_scrapli_conn.send_command.return_value.result = "Success rate is 100 percent (5/5)"
         result = json.loads(await cisco_ping("router1", "8.8.8.8"))
         assert result["status"] == "ok"
         assert "100 percent" in result["output"]
         mock_scrapli_conn.close.assert_called_once()
 
     @patch("server._get_conn")
-    async def test_ping_with_count(
-        self, mock_get_conn, mock_devices, mock_scrapli_conn
-    ):
+    async def test_ping_with_count(self, mock_get_conn, mock_devices, mock_scrapli_conn):
         mock_get_conn.return_value = mock_scrapli_conn
         await cisco_ping("router1", "10.0.0.1", count=10)
         call_args = mock_scrapli_conn.send_command.call_args
@@ -185,9 +179,7 @@ class TestCiscoPing:
 @pytest.mark.asyncio
 class TestCiscoGetRunningConfig:
     @patch("server._get_conn")
-    async def test_get_running_config_full(
-        self, mock_get_conn, mock_devices, mock_scrapli_conn
-    ):
+    async def test_get_running_config_full(self, mock_get_conn, mock_devices, mock_scrapli_conn):
         mock_get_conn.return_value = mock_scrapli_conn
         mock_scrapli_conn.send_command.return_value.result = (
             "hostname Router1\n!\ninterface GigabitEthernet0/0"
@@ -198,13 +190,9 @@ class TestCiscoGetRunningConfig:
         assert "hostname" in result["output"]
 
     @patch("server._get_conn")
-    async def test_get_running_config_section(
-        self, mock_get_conn, mock_devices, mock_scrapli_conn
-    ):
+    async def test_get_running_config_section(self, mock_get_conn, mock_devices, mock_scrapli_conn):
         mock_get_conn.return_value = mock_scrapli_conn
-        result = json.loads(
-            await cisco_get_running_config("router1", section="interface")
-        )
+        result = json.loads(await cisco_get_running_config("router1", section="interface"))
         assert result["status"] == "ok"
         assert "section interface" in result["command"]
 

@@ -97,8 +97,7 @@ async def cisco_configure(device_name: str, config_commands: str) -> str:
     lines = [
         line.rstrip()
         for line in config_commands.strip().splitlines()
-        if line.strip()
-        and line.strip().lower() not in {"configure terminal", "conf t", "end"}
+        if line.strip() and line.strip().lower() not in {"configure terminal", "conf t", "end"}
     ]
 
     if not lines:
@@ -111,9 +110,7 @@ async def cisco_configure(device_name: str, config_commands: str) -> str:
     conn = await _get_conn(device_name)
     try:
         response = await conn.send_configs(lines)
-        return ok_response(
-            device=device_name, commands_applied=lines, output=response.result
-        )
+        return ok_response(device=device_name, commands_applied=lines, output=response.result)
     finally:
         conn.close()
 
